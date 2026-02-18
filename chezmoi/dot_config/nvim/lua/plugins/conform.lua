@@ -10,6 +10,7 @@ return {
 			formatters_by_ft = {
 				c = { "clang-format" },
 				cpp = { "clang-format" },
+                json = { "clang-format" },
 				lua = { "stylua" },
 				go = { "gofmt" },
 				javascript = { "biome" },
