@@ -5,3 +5,6 @@ git:
 
 shell:
   preferred: zsh
+
+go:
+  privateModules: github.com/tickup-se/*

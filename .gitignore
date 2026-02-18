@@ -1,8 +1,27 @@
 .DS_Store
-*.retry
+Thumbs.db
+
+# Editor swap files
 *.swp
 *.swo
+
+# Python and virtualenv
+__pycache__/
+*.py[cod]
+/.venv/
+
+# Local working directories
 /.ansible/
 /.cache/
 /.tmp/
-/.venv/
+
+# Ansible runtime artifacts
+*.retry
+ansible.log
+*.vault-pass
+*.vault-pass.txt
+
+# Chezmoi local-only artifacts
+/chezmoi/.git/
+/chezmoi/.chezmoi.toml
+/chezmoi/.chezmoi.toml.tmpl

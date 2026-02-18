@@ -43,6 +43,10 @@ Starter repo for managing:
    - `ansible/group_vars/all.yml`
    - `chezmoi/.chezmoidata.yaml`
 
+   Go defaults are configurable:
+   - `go_version` in `ansible/group_vars/all.yml` (for example `1.24.0`)
+   - `go.privateModules` in `chezmoi/.chezmoidata.yaml` (defaults to `github.com/tickup-se/*`)
+
 4. Re-run anytime:
 
    ```bash
@@ -66,6 +70,8 @@ make ansible
 - macOS bootstrap installs Homebrew if missing, then uses Homebrew for package installs.
 - Linux bootstrap installs Homebrew if missing, then can install both distro packages and optional Homebrew packages.
 - Default Homebrew tap includes `anomalyco/tap` with `anomalyco/tap/opencode` in the starter package list.
+- Go is installed from official `go.dev/dl` tarballs to `~/.local/go/go<version>` with `~/.local/go/current` symlinked to the selected `go_version`.
+- Shell config exports `GOPRIVATE` using `go.privateModules` from chezmoi data.
 - Shell prompt uses `oh-my-posh` with upstream default `eval "$(oh-my-posh init zsh)"`.
 - chezmoi externals include `zsh-autosuggestions` and `zsh-syntax-highlighting` plugins.
 

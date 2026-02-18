@@ -17,6 +17,7 @@ linux_brew_packages:
   - anomalyco/tap/opencode
   - neovim
   - oh-my-posh
+  - tree-sitter-cli
 
 macos_brew_packages:
   - git
@@ -25,8 +26,11 @@ macos_brew_packages:
   - neovim
   - anomalyco/tap/opencode
   - oh-my-posh
+  - tree-sitter-cli
 
 macos_cask_packages: []
 
 oh_my_posh_install_font: true
 oh_my_posh_font: meslo
+
+go_version: "1.26.0"
