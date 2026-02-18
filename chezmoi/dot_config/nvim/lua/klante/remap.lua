@@ -1,6 +1,7 @@
 vim.g.mapleader = " "
 
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+-- Replaced by Yazi
+-- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 -- Select code and then move up/down with J and K
 vim.keymap.set("v", "K", ":m '<-2 <CR>gv=gv", { desc = "Move visuabl block up"})

@@ -19,6 +19,7 @@ linux_brew_packages:
   - neovim
   - oh-my-posh
   - tree-sitter-cli
+  - yazi
 
 macos_brew_packages:
   - git
@@ -29,6 +30,7 @@ macos_brew_packages:
   - anomalyco/tap/opencode
   - oh-my-posh
   - tree-sitter-cli
+  - yazi
 
 macos_cask_packages: []
 

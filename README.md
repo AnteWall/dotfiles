@@ -79,6 +79,7 @@ make ansible
 - Rust is installed with `rustup` from `https://sh.rustup.rs` using configurable `rustup_default_toolchain` and `rustup_profile`.
 - Shell config includes `~/.cargo/bin` so `cargo`, `rustc`, and `rustup` are available in new shells.
 - `fnm` is installed via Homebrew and sets `fnm_node_version` as the default Node.js version.
+- `yazi` is installed via Homebrew on both macOS and Linux.
 - Bootstrap ensures `~/.ssh` exists with secure permissions (`0700`).
 - zsh config starts `ssh-agent` automatically when needed and loads keys listed in `ssh.keyFiles`.
 - Shell config initializes `fnm env --use-on-cd --shell zsh` so the selected Node.js version is active in new zsh sessions.
