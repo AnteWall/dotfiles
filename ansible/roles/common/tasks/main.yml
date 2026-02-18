@@ -117,3 +117,10 @@
   when:
     - ansible_system in ["Darwin", "Linux"]
     - not go_version_installed.stat.exists
+
+- name: Install rustup and default Rust toolchain
+  ansible.builtin.shell:
+    cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain {{ rustup_default_toolchain | default('stable') }} --profile {{ rustup_profile | default('default') }}"
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/rustup"
+  when: ansible_system in ["Darwin", "Linux"]

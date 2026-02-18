@@ -34,3 +34,6 @@ oh_my_posh_install_font: true
 oh_my_posh_font: meslo
 
 go_version: "1.26.0"
+
+rustup_default_toolchain: stable
+rustup_profile: default
