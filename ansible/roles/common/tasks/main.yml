@@ -4,46 +4,46 @@
     name: "{{ common_packages | default([]) }}"
     state: present
   become: true
-  when: ansible_system == "Linux" and (common_packages | default([]) | length > 0)
+  when: ansible_facts['system'] == "Linux" and (common_packages | default([]) | length > 0)
 
 - name: Install common packages on macOS with Homebrew
   community.general.homebrew:
     name: "{{ common_packages | default([]) }}"
     state: present
-  when: ansible_system == "Darwin" and (common_packages | default([]) | length > 0)
+  when: ansible_facts['system'] == "Darwin" and (common_packages | default([]) | length > 0)
   environment:
-    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Install chezmoi on macOS with Homebrew
   community.general.homebrew:
     name: chezmoi
     state: present
-  when: ansible_system == "Darwin"
+  when: ansible_facts['system'] == "Darwin"
   environment:
-    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Install chezmoi on Linux
   ansible.builtin.shell:
-    cmd: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "{{ ansible_env.HOME }}/.local/bin"
+    cmd: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "{{ ansible_facts['env']['HOME'] }}/.local/bin"
   args:
-    creates: "{{ ansible_env.HOME }}/.local/bin/chezmoi"
-  when: ansible_system == "Linux"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/chezmoi"
+  when: ansible_facts['system'] == "Linux"
 
 - name: Ensure SSH config directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.ssh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
     state: directory
     mode: "0700"
-  when: ansible_system in ["Darwin", "Linux"]
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
 
 - name: Set Go distribution OS
   ansible.builtin.set_fact:
-    go_dist_os: "{{ 'darwin' if ansible_system == 'Darwin' else 'linux' }}"
-  when: ansible_system in ["Darwin", "Linux"]
+    go_dist_os: "{{ 'darwin' if ansible_facts['system'] == 'Darwin' else 'linux' }}"
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
 
 - name: Set Go distribution architecture
   ansible.builtin.set_fact:
-    go_dist_arch: "{{ go_arch_map[ansible_architecture] }}"
+    go_dist_arch: "{{ go_arch_map[ansible_facts['architecture']] }}"
   vars:
     go_arch_map:
       x86_64: amd64
@@ -51,28 +51,28 @@
       arm64: arm64
       aarch64: arm64
   when:
-    - ansible_system in ["Darwin", "Linux"]
-    - ansible_architecture in ["x86_64", "amd64", "arm64", "aarch64"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
+    - ansible_facts['architecture'] in ["x86_64", "amd64", "arm64", "aarch64"]
 
 - name: Fail when architecture is unsupported for Go tarball install
   ansible.builtin.fail:
-    msg: "Unsupported architecture for Go install: {{ ansible_architecture }}"
+    msg: "Unsupported architecture for Go install: {{ ansible_facts['architecture'] }}"
   when:
-    - ansible_system in ["Darwin", "Linux"]
-    - ansible_architecture not in ["x86_64", "amd64", "arm64", "aarch64"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
+    - ansible_facts['architecture'] not in ["x86_64", "amd64", "arm64", "aarch64"]
 
 - name: Ensure Go install root exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.local/go"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/go"
     state: directory
     mode: "0755"
-  when: ansible_system in ["Darwin", "Linux"]
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
 
 - name: Check whether selected Go version is already installed
   ansible.builtin.stat:
-    path: "{{ ansible_env.HOME }}/.local/go/go{{ go_version }}/bin/go"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/go/go{{ go_version }}/bin/go"
   register: go_version_installed
-  when: ansible_system in ["Darwin", "Linux"]
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
 
 - name: Create temporary directory for Go extraction
   ansible.builtin.tempfile:
@@ -80,7 +80,7 @@
     prefix: go-install-
   register: go_extract_tmp
   when:
-    - ansible_system in ["Darwin", "Linux"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
     - not go_version_installed.stat.exists
 
 - name: Download Go archive
@@ -89,45 +89,44 @@
     dest: "{{ go_extract_tmp.path }}/go{{ go_version }}.tar.gz"
     mode: "0644"
   when:
-    - ansible_system in ["Darwin", "Linux"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
     - not go_version_installed.stat.exists
 
 - name: Extract Go archive
-  ansible.builtin.unarchive:
-    src: "{{ go_extract_tmp.path }}/go{{ go_version }}.tar.gz"
-    dest: "{{ go_extract_tmp.path }}"
-    remote_src: true
+  ansible.builtin.command:
+    cmd: "tar -xzf {{ go_extract_tmp.path }}/go{{ go_version }}.tar.gz -C {{ go_extract_tmp.path }}"
+    creates: "{{ go_extract_tmp.path }}/go/bin/go"
   when:
-    - ansible_system in ["Darwin", "Linux"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
     - not go_version_installed.stat.exists
 
 - name: Install selected Go version
   ansible.builtin.command:
-    cmd: "mv {{ go_extract_tmp.path }}/go {{ ansible_env.HOME }}/.local/go/go{{ go_version }}"
-    creates: "{{ ansible_env.HOME }}/.local/go/go{{ go_version }}/bin/go"
+    cmd: "mv {{ go_extract_tmp.path }}/go {{ ansible_facts['env']['HOME'] }}/.local/go/go{{ go_version }}"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/go/go{{ go_version }}/bin/go"
   when:
-    - ansible_system in ["Darwin", "Linux"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
     - not go_version_installed.stat.exists
 
 - name: Point current Go symlink to selected version
   ansible.builtin.file:
-    src: "{{ ansible_env.HOME }}/.local/go/go{{ go_version }}"
-    dest: "{{ ansible_env.HOME }}/.local/go/current"
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/go/go{{ go_version }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/go/current"
     state: link
     force: true
-  when: ansible_system in ["Darwin", "Linux"]
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
 
 - name: Remove temporary Go extraction directory
   ansible.builtin.file:
     path: "{{ go_extract_tmp.path }}"
     state: absent
   when:
-    - ansible_system in ["Darwin", "Linux"]
+    - ansible_facts['system'] in ["Darwin", "Linux"]
     - not go_version_installed.stat.exists
 
 - name: Install rustup and default Rust toolchain
   ansible.builtin.shell:
     cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain {{ rustup_default_toolchain | default('stable') }} --profile {{ rustup_profile | default('default') }}"
   args:
-    creates: "{{ ansible_env.HOME }}/.cargo/bin/rustup"
-  when: ansible_system in ["Darwin", "Linux"]
+    creates: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/rustup"
+  when: ansible_facts['system'] in ["Darwin", "Linux"]

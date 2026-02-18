@@ -1,0 +1,35 @@
+{
+  "version": 3,
+  "skills": {
+    "clickhouse-best-practices": {
+      "source": "clickhouse/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/clickhouse/agent-skills.git",
+      "skillPath": "skills/clickhouse-best-practices/SKILL.md",
+      "skillFolderHash": "056b2ad6aa7b6585623677f9b2eeb2b887f829ef",
+      "installedAt": "2026-02-17T10:29:34.538Z",
+      "updatedAt": "2026-02-17T10:29:34.538Z"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "c2f31172b6f256272305a5e6e7228b258446899f",
+      "installedAt": "2026-02-17T10:29:40.764Z",
+      "updatedAt": "2026-02-17T10:29:40.764Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "codex",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-cli",
+    "opencode",
+    "claude-code"
+  ]
+}

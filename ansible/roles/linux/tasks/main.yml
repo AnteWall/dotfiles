@@ -6,7 +6,7 @@
 
 - name: Check for Homebrew in user location
   ansible.builtin.stat:
-    path: "{{ ansible_env.HOME }}/.linuxbrew/bin/brew"
+    path: "{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin/brew"
   register: brew_user
 
 - name: Install Homebrew on Linux if missing
@@ -20,11 +20,11 @@
     state: present
   when: homebrew_taps | default([]) | length > 0
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Install Linux-specific packages
   ansible.builtin.debug:
-    msg: "Installing Linux packages with {{ ansible_pkg_mgr }}: {{ linux_packages | default([]) | join(', ') }}"
+    msg: "Installing Linux packages with {{ ansible_facts['pkg_mgr'] }}: {{ linux_packages | default([]) | join(', ') }}"
   when: linux_packages | default([]) | length > 0
 
 - name: Install Linux-specific packages with apt
@@ -38,7 +38,7 @@
     DEBIAN_FRONTEND: noninteractive
   when:
     - linux_packages | default([]) | length > 0
-    - ansible_pkg_mgr == "apt"
+    - ansible_facts['pkg_mgr'] == "apt"
 
 - name: Install Linux-specific packages with dnf
   ansible.builtin.dnf:
@@ -49,7 +49,7 @@
   become: true
   when:
     - linux_packages | default([]) | length > 0
-    - ansible_pkg_mgr == "dnf"
+    - ansible_facts['pkg_mgr'] == "dnf"
 
 - name: Install Linux-specific packages with pacman
   community.general.pacman:
@@ -59,7 +59,7 @@
   become: true
   when:
     - linux_packages | default([]) | length > 0
-    - ansible_pkg_mgr == "pacman"
+    - ansible_facts['pkg_mgr'] == "pacman"
 
 - name: Install Linux-specific packages with generic package manager
   ansible.builtin.package:
@@ -68,7 +68,7 @@
   become: true
   when:
     - linux_packages | default([]) | length > 0
-    - ansible_pkg_mgr not in ["apt", "dnf", "pacman"]
+    - ansible_facts['pkg_mgr'] not in ["apt", "dnf", "pacman"]
 
 - name: Get zsh binary path
   ansible.builtin.command: /usr/bin/which zsh
@@ -77,7 +77,7 @@
 
 - name: Set default shell to zsh for current user
   ansible.builtin.user:
-    name: "{{ ansible_user_id }}"
+    name: "{{ ansible_facts['user_id'] }}"
     shell: "{{ linux_zsh_path.stdout }}"
   become: true
   when: linux_zsh_path.stdout | length > 0
@@ -88,7 +88,7 @@
     state: present
   when: linux_brew_packages | default([]) | length > 0
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Check installed fnm Node.js versions on Linux
   ansible.builtin.command:
@@ -97,7 +97,7 @@
   changed_when: false
   when: "'fnm' in (linux_brew_packages | default([]))"
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Install configured Node.js version with fnm on Linux
   ansible.builtin.command:
@@ -106,7 +106,7 @@
     - "'fnm' in (linux_brew_packages | default([]))"
     - "('v' ~ fnm_node_version) not in (fnm_linux_installed_versions.stdout | default(''))"
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Check current fnm default Node.js version on Linux
   ansible.builtin.command:
@@ -116,7 +116,7 @@
   failed_when: false
   when: "'fnm' in (linux_brew_packages | default([]))"
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Set configured Node.js version as fnm default on Linux
   ansible.builtin.command:
@@ -125,11 +125,11 @@
     - "'fnm' in (linux_brew_packages | default([]))"
     - fnm_linux_default_version.rc | default(1) != 0 or ((fnm_linux_default_version.stdout | default('') | trim) not in [fnm_node_version, 'v' ~ fnm_node_version])
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['PATH'] }}"
 
 - name: Check if Oh My Posh font is already installed on Linux
   ansible.builtin.find:
-    paths: "{{ ansible_env.HOME }}/.local/share/fonts"
+    paths: "{{ ansible_facts['env']['HOME'] }}/.local/share/fonts"
     patterns: "*{{ oh_my_posh_font | default('meslo') | capitalize }}*"
     file_type: file
   register: oh_my_posh_linux_font_files
@@ -142,4 +142,4 @@
     - oh_my_posh_install_font | default(true)
     - oh_my_posh_linux_font_files.matched | default(0) == 0
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.linuxbrew/bin:{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"

@@ -25,3 +25,4 @@ ansible.log
 /chezmoi/.git/
 /chezmoi/.chezmoi.toml
 /chezmoi/.chezmoi.toml.tmpl
+/chezmoi/**/dot_git/**

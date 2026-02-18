@@ -9,6 +9,6 @@
   roles:
     - role: common
     - role: linux
-      when: ansible_system == "Linux"
+      when: ansible_facts['system'] == "Linux"
     - role: macos
-      when: ansible_system == "Darwin"
+      when: ansible_facts['system'] == "Darwin"
