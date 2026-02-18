@@ -1,6 +1,13 @@
 -- Fat vim cursor
 vim.opt.guicursor = ""
 
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+    pattern = "*.json.tmpl",
+    callback = function()
+        vim.bo.filetype = "json"
+    end,
+})
+
 -- Fix line numbers
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -45,4 +52,3 @@ vim.opt.colorcolumn = "80"
 
 -- Space is leader!
 vim.g.mapleader = " "
-

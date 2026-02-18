@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "tickup-etl": {
+      "type": "remote",
+      "url": "{{ (onepasswordDetailsFields "gzdmxnpsqyxjenoq5h3mkh7dfq").url.value }}"
+    },
+    "clickhouse-docs": {
+      "type": "remote",
+      "url": "https://clickhouse.mcp.kapa.ai/"
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{{ (onepasswordDetailsFields "cucm6bqsxclzdfipvwivzdmsje").credential.value }}"
+      },
+      "enabled": true
+    }
+  }
+}
