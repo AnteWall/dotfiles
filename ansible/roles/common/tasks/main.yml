@@ -29,6 +29,13 @@
     creates: "{{ ansible_env.HOME }}/.local/bin/chezmoi"
   when: ansible_system == "Linux"
 
+- name: Ensure SSH config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: "0700"
+  when: ansible_system in ["Darwin", "Linux"]
+
 - name: Set Go distribution OS
   ansible.builtin.set_fact:
     go_dist_os: "{{ 'darwin' if ansible_system == 'Darwin' else 'linux' }}"

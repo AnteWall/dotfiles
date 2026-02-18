@@ -3,6 +3,9 @@ export VISUAL="nvim"
 export GOPRIVATE="{{ .go.privateModules | default "github.com/tickup-se/*" }}"
 export PATH="$HOME/.cargo/bin:$HOME/.local/go/current/bin:$PATH"
 
+# Disable the bell sound
+unsetopt BEEP
+
 if [ -f "$HOME/.profile" ]; then
   source "$HOME/.profile"
 fi
@@ -21,8 +24,33 @@ alias ll='ls -lah'
 alias vim='nvim'
 alias vi='nvim'
 
+if command -v ssh-agent >/dev/null 2>&1 && command -v ssh-add >/dev/null 2>&1; then
+  if [ -f "$HOME/.ssh/agent.env" ]; then
+    source "$HOME/.ssh/agent.env" >/dev/null 2>&1
+  fi
+
+  ssh-add -l >/dev/null 2>&1
+  ssh_agent_status=$?
+
+  if [ "$ssh_agent_status" -eq 2 ]; then
+    umask 077
+    ssh-agent -s > "$HOME/.ssh/agent.env"
+    source "$HOME/.ssh/agent.env" >/dev/null 2>&1
+  fi
+
+{{- range .ssh.keyFiles }}
+  if [ -f "$HOME/.ssh/{{ . }}" ]; then
+    ssh-add "$HOME/.ssh/{{ . }}" >/dev/null 2>&1 || true
+  fi
+{{- end }}
+fi
+
 if command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init zsh)"
+fi
+
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
 fi
 
 if [ -f "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then

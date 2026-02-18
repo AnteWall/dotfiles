@@ -8,3 +8,8 @@ shell:
 
 go:
   privateModules: github.com/tickup-se/*
+
+ssh:
+  keyFiles:
+    - id_ed25519
+    - id_rsa

@@ -30,6 +30,43 @@
   environment:
     PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
 
+- name: Check installed fnm Node.js versions on macOS
+  ansible.builtin.command:
+    cmd: fnm list
+  register: fnm_macos_installed_versions
+  changed_when: false
+  when: "'fnm' in (macos_brew_packages | default([]))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Install configured Node.js version with fnm on macOS
+  ansible.builtin.command:
+    cmd: "fnm install {{ fnm_node_version }}"
+  when:
+    - "'fnm' in (macos_brew_packages | default([]))"
+    - "('v' ~ fnm_node_version) not in (fnm_macos_installed_versions.stdout | default(''))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Check current fnm default Node.js version on macOS
+  ansible.builtin.command:
+    cmd: fnm default
+  register: fnm_macos_default_version
+  changed_when: false
+  failed_when: false
+  when: "'fnm' in (macos_brew_packages | default([]))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Set configured Node.js version as fnm default on macOS
+  ansible.builtin.command:
+    cmd: "fnm default {{ fnm_node_version }}"
+  when:
+    - "'fnm' in (macos_brew_packages | default([]))"
+    - fnm_macos_default_version.rc | default(1) != 0 or ((fnm_macos_default_version.stdout | default('') | trim) not in [fnm_node_version, 'v' ~ fnm_node_version])
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
 - name: Ensure Homebrew cask packages are installed
   community.general.homebrew_cask:
     name: "{{ macos_cask_packages | default([]) }}"

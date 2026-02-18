@@ -90,6 +90,43 @@
   environment:
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
 
+- name: Check installed fnm Node.js versions on Linux
+  ansible.builtin.command:
+    cmd: fnm list
+  register: fnm_linux_installed_versions
+  changed_when: false
+  when: "'fnm' in (linux_brew_packages | default([]))"
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+
+- name: Install configured Node.js version with fnm on Linux
+  ansible.builtin.command:
+    cmd: "fnm install {{ fnm_node_version }}"
+  when:
+    - "'fnm' in (linux_brew_packages | default([]))"
+    - "('v' ~ fnm_node_version) not in (fnm_linux_installed_versions.stdout | default(''))"
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+
+- name: Check current fnm default Node.js version on Linux
+  ansible.builtin.command:
+    cmd: fnm default
+  register: fnm_linux_default_version
+  changed_when: false
+  failed_when: false
+  when: "'fnm' in (linux_brew_packages | default([]))"
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+
+- name: Set configured Node.js version as fnm default on Linux
+  ansible.builtin.command:
+    cmd: "fnm default {{ fnm_node_version }}"
+  when:
+    - "'fnm' in (linux_brew_packages | default([]))"
+    - fnm_linux_default_version.rc | default(1) != 0 or ((fnm_linux_default_version.stdout | default('') | trim) not in [fnm_node_version, 'v' ~ fnm_node_version])
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+
 - name: Check if Oh My Posh font is already installed on Linux
   ansible.builtin.find:
     paths: "{{ ansible_env.HOME }}/.local/share/fonts"

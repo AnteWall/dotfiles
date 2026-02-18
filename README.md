@@ -45,7 +45,9 @@ Starter repo for managing:
 
    Go defaults are configurable:
    - `go_version` in `ansible/group_vars/all.yml` (for example `1.24.0`)
+   - `fnm_node_version` in `ansible/group_vars/all.yml` (for example `25.6.1`)
    - `go.privateModules` in `chezmoi/.chezmoidata.yaml` (defaults to `github.com/tickup-se/*`)
+   - `ssh.keyFiles` in `chezmoi/.chezmoidata.yaml` (for example `id_ed25519`, `id_rsa`)
    - `rustup_default_toolchain` in `ansible/group_vars/all.yml` (for example `stable`)
    - `rustup_profile` in `ansible/group_vars/all.yml` (`minimal`, `default`, or `complete`)
 
@@ -76,6 +78,10 @@ make ansible
 - Shell config exports `GOPRIVATE` using `go.privateModules` from chezmoi data.
 - Rust is installed with `rustup` from `https://sh.rustup.rs` using configurable `rustup_default_toolchain` and `rustup_profile`.
 - Shell config includes `~/.cargo/bin` so `cargo`, `rustc`, and `rustup` are available in new shells.
+- `fnm` is installed via Homebrew and sets `fnm_node_version` as the default Node.js version.
+- Bootstrap ensures `~/.ssh` exists with secure permissions (`0700`).
+- zsh config starts `ssh-agent` automatically when needed and loads keys listed in `ssh.keyFiles`.
+- Shell config initializes `fnm env --use-on-cd --shell zsh` so the selected Node.js version is active in new zsh sessions.
 - Shell prompt uses `oh-my-posh` with upstream default `eval "$(oh-my-posh init zsh)"`.
 - chezmoi externals include `zsh-autosuggestions` and `zsh-syntax-highlighting` plugins.
 

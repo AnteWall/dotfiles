@@ -15,6 +15,7 @@ homebrew_taps:
 
 linux_brew_packages:
   - anomalyco/tap/opencode
+  - fnm
   - neovim
   - oh-my-posh
   - tree-sitter-cli
@@ -23,6 +24,7 @@ macos_brew_packages:
   - git
   - curl
   - zsh
+  - fnm
   - neovim
   - anomalyco/tap/opencode
   - oh-my-posh
@@ -37,3 +39,5 @@ go_version: "1.26.0"
 
 rustup_default_toolchain: stable
 rustup_profile: default
+
+fnm_node_version: "25.6.1"

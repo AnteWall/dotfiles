@@ -29,16 +29,28 @@ return {
 
         require("fidget").setup({})
         require("mason").setup()
+
+        local managed_servers = {
+            lua_ls = true,
+            rust_analyzer = true,
+            gopls = true,
+            vtsls = true,
+            zls = true,
+        }
+
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
                 "rust_analyzer",
                 "gopls",
                 "vtsls",
-                "tailwindcss",
             },
             handlers = {
                 function(server_name) -- default handler (optional)
+                    if not managed_servers[server_name] then
+                        return
+                    end
+
                     require("lspconfig")[server_name].setup {
                         capabilities = capabilities
                     }
@@ -89,13 +101,6 @@ return {
                             }
                         }
                     }
-                end,
-                ["tailwindcss"] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.tailwindcss.setup({
-                        capabilities = capabilities,
-                        filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte", "heex" },
-                    })
                 end,
             }
         })
