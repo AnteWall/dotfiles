@@ -46,7 +46,7 @@ return {
       table.insert(lualine_y, codecompanion)
     end
 
-    vim.o.laststatus = 3
+    vim.o.laststatus = 2
 
     local opts = {
       options = {
