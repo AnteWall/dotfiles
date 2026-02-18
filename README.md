@@ -88,6 +88,17 @@ Oh My Posh notes (from upstream docs):
 
 WSL2 users: see `docs/wsl.md` for Windows Terminal font and shell setup.
 
+## WSL2
+
+If you want to use `copilot.lua`/Copilot in Neovim on WSL2, install these packages manually first:
+
+```bash
+sudo apt update
+sudo apt install -y wslu firefox
+```
+
+This provides `wslview` (from `wslu`) and a browser (`firefox`) for GitHub device/code login flow.
+
 To refresh external plugins managed by chezmoi:
 
 ```bash
