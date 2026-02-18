@@ -80,6 +80,7 @@ make ansible
 - Shell config includes `~/.cargo/bin` so `cargo`, `rustc`, and `rustup` are available in new shells.
 - `fnm` is installed via Homebrew and sets `fnm_node_version` as the default Node.js version.
 - `yazi` is installed via Homebrew on both macOS and Linux.
+- Yazi keymap includes `a` to create files (or directories when ending with `/`) and `A` to create directories directly.
 - Bootstrap ensures `~/.ssh` exists with secure permissions (`0700`).
 - zsh config starts `ssh-agent` automatically when needed and loads keys listed in `ssh.keyFiles`.
 - Shell config initializes `fnm env --use-on-cd --shell zsh` so the selected Node.js version is active in new zsh sessions.
