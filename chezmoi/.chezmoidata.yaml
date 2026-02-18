@@ -1,0 +1,7 @@
+---
+git:
+  name: Your Name
+  email: you@example.com
+
+shell:
+  preferred: zsh

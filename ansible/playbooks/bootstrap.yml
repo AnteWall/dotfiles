@@ -1,0 +1,14 @@
+---
+- name: Bootstrap local machine
+  hosts: localhost
+  gather_facts: true
+  become: false
+  vars_files:
+    - ../group_vars/all.yml
+
+  roles:
+    - role: common
+    - role: linux
+      when: ansible_system == "Linux"
+    - role: macos
+      when: ansible_system == "Darwin"

@@ -1,0 +1,8 @@
+.DS_Store
+*.retry
+*.swp
+*.swo
+/.ansible/
+/.cache/
+/.tmp/
+/.venv/

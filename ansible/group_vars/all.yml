@@ -1,0 +1,32 @@
+---
+# Cross-platform defaults. Update these to match your tools.
+
+common_packages:
+  - git
+  - curl
+  - unzip
+
+linux_packages:
+  - build-essential
+  - zsh
+
+homebrew_taps:
+  - anomalyco/tap
+
+linux_brew_packages:
+  - anomalyco/tap/opencode
+  - neovim
+  - oh-my-posh
+
+macos_brew_packages:
+  - git
+  - curl
+  - zsh
+  - neovim
+  - anomalyco/tap/opencode
+  - oh-my-posh
+
+macos_cask_packages: []
+
+oh_my_posh_install_font: true
+oh_my_posh_font: meslo

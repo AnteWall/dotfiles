@@ -1,0 +1,56 @@
+---
+- name: Check for Homebrew in Apple Silicon location
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/brew
+  register: brew_opt
+
+- name: Check for Homebrew in Intel macOS location
+  ansible.builtin.stat:
+    path: /usr/local/bin/brew
+  register: brew_usr_local
+
+- name: Install Homebrew if missing
+  ansible.builtin.shell:
+    cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not brew_opt.stat.exists and not brew_usr_local.stat.exists
+
+- name: Ensure Homebrew taps are configured on macOS
+  community.general.homebrew_tap:
+    name: "{{ homebrew_taps | default([]) }}"
+    state: present
+  when: homebrew_taps | default([]) | length > 0
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Ensure Homebrew formula packages are installed
+  community.general.homebrew:
+    name: "{{ macos_brew_packages | default([]) }}"
+    state: present
+  when: macos_brew_packages | default([]) | length > 0
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Ensure Homebrew cask packages are installed
+  community.general.homebrew_cask:
+    name: "{{ macos_cask_packages | default([]) }}"
+    state: present
+  when: macos_cask_packages | default([]) | length > 0
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Check if Oh My Posh font is already installed on macOS
+  ansible.builtin.find:
+    paths: "{{ ansible_env.HOME }}/Library/Fonts"
+    patterns: "*{{ oh_my_posh_font | default('meslo') | capitalize }}*"
+    file_type: file
+  register: oh_my_posh_macos_font_files
+  when: oh_my_posh_install_font | default(true)
+
+- name: Install Oh My Posh font on macOS
+  ansible.builtin.command:
+    cmd: "oh-my-posh font install {{ oh_my_posh_font | default('meslo') }}"
+  when:
+    - oh_my_posh_install_font | default(true)
+    - oh_my_posh_macos_font_files.matched | default(0) == 0
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"

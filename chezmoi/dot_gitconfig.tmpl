@@ -1,0 +1,12 @@
+[user]
+    name = {{ .git.name | quote }}
+    email = {{ .git.email | quote }}
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[core]
+    editor = nvim

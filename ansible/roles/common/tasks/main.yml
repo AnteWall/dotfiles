@@ -1,0 +1,30 @@
+---
+- name: Install common packages on Linux
+  ansible.builtin.package:
+    name: "{{ common_packages | default([]) }}"
+    state: present
+  become: true
+  when: ansible_system == "Linux" and (common_packages | default([]) | length > 0)
+
+- name: Install common packages on macOS with Homebrew
+  community.general.homebrew:
+    name: "{{ common_packages | default([]) }}"
+    state: present
+  when: ansible_system == "Darwin" and (common_packages | default([]) | length > 0)
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Install chezmoi on macOS with Homebrew
+  community.general.homebrew:
+    name: chezmoi
+    state: present
+  when: ansible_system == "Darwin"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Install chezmoi on Linux
+  ansible.builtin.shell:
+    cmd: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "{{ ansible_env.HOME }}/.local/bin"
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/bin/chezmoi"
+  when: ansible_system == "Linux"

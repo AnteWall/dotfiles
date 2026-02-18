@@ -1,0 +1,32 @@
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+if [ -f "$HOME/.profile" ]; then
+  source "$HOME/.profile"
+fi
+
+{{- if eq .chezmoi.os "darwin" }}
+# macOS defaults
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+{{- end }}
+
+{{- if eq .chezmoi.os "linux" }}
+# Linux defaults
+export PATH="/home/linuxbrew/.linuxbrew/bin:$HOME/.linuxbrew/bin:$HOME/.local/bin:$PATH"
+{{- end }}
+
+alias ll='ls -lah'
+alias vim='nvim'
+alias vi='nvim'
+
+if command -v oh-my-posh >/dev/null 2>&1; then
+  eval "$(oh-my-posh init zsh)"
+fi
+
+if [ -f "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+  source "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+if [ -f "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+  source "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi

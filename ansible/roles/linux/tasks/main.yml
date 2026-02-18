@@ -1,0 +1,108 @@
+---
+- name: Check for Homebrew in system location
+  ansible.builtin.stat:
+    path: /home/linuxbrew/.linuxbrew/bin/brew
+  register: brew_system
+
+- name: Check for Homebrew in user location
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.linuxbrew/bin/brew"
+  register: brew_user
+
+- name: Install Homebrew on Linux if missing
+  ansible.builtin.shell:
+    cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not brew_system.stat.exists and not brew_user.stat.exists
+
+- name: Ensure Homebrew taps are configured on Linux
+  community.general.homebrew_tap:
+    name: "{{ homebrew_taps | default([]) }}"
+    state: present
+  when: homebrew_taps | default([]) | length > 0
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+
+- name: Install Linux-specific packages
+  ansible.builtin.debug:
+    msg: "Installing Linux packages with {{ ansible_pkg_mgr }}: {{ linux_packages | default([]) | join(', ') }}"
+  when: linux_packages | default([]) | length > 0
+
+- name: Install Linux-specific packages with apt
+  ansible.builtin.apt:
+    name: "{{ linux_packages | default([]) }}"
+    state: present
+    update_cache: true
+    lock_timeout: 300
+  become: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when:
+    - linux_packages | default([]) | length > 0
+    - ansible_pkg_mgr == "apt"
+
+- name: Install Linux-specific packages with dnf
+  ansible.builtin.dnf:
+    name: "{{ linux_packages | default([]) }}"
+    state: present
+    update_cache: true
+    lock_timeout: 300
+  become: true
+  when:
+    - linux_packages | default([]) | length > 0
+    - ansible_pkg_mgr == "dnf"
+
+- name: Install Linux-specific packages with pacman
+  community.general.pacman:
+    name: "{{ linux_packages | default([]) }}"
+    state: present
+    update_cache: true
+  become: true
+  when:
+    - linux_packages | default([]) | length > 0
+    - ansible_pkg_mgr == "pacman"
+
+- name: Install Linux-specific packages with generic package manager
+  ansible.builtin.package:
+    name: "{{ linux_packages | default([]) }}"
+    state: present
+  become: true
+  when:
+    - linux_packages | default([]) | length > 0
+    - ansible_pkg_mgr not in ["apt", "dnf", "pacman"]
+
+- name: Get zsh binary path
+  ansible.builtin.command: /usr/bin/which zsh
+  register: linux_zsh_path
+  changed_when: false
+
+- name: Set default shell to zsh for current user
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    shell: "{{ linux_zsh_path.stdout }}"
+  become: true
+  when: linux_zsh_path.stdout | length > 0
+
+- name: Install Linux Homebrew packages
+  community.general.homebrew:
+    name: "{{ linux_brew_packages | default([]) }}"
+    state: present
+  when: linux_brew_packages | default([]) | length > 0
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.PATH }}"
+
+- name: Check if Oh My Posh font is already installed on Linux
+  ansible.builtin.find:
+    paths: "{{ ansible_env.HOME }}/.local/share/fonts"
+    patterns: "*{{ oh_my_posh_font | default('meslo') | capitalize }}*"
+    file_type: file
+  register: oh_my_posh_linux_font_files
+  when: oh_my_posh_install_font | default(true)
+
+- name: Install Oh My Posh font on Linux
+  ansible.builtin.command:
+    cmd: "oh-my-posh font install {{ oh_my_posh_font | default('meslo') }}"
+  when:
+    - oh_my_posh_install_font | default(true)
+    - oh_my_posh_linux_font_files.matched | default(0) == 0
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.HOME }}/.linuxbrew/bin:{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
