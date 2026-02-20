@@ -21,6 +21,7 @@ linux_brew_packages:
   - tree-sitter-cli
   - yazi
   - 1password-cli
+  - uv
 
 macos_brew_packages:
   - git
@@ -33,6 +34,7 @@ macos_brew_packages:
   - tree-sitter-cli
   - yazi
   - 1password-cli
+  - uv
 
 macos_cask_packages: []
 
