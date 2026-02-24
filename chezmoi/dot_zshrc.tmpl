@@ -25,6 +25,11 @@ alias ll='ls -lah'
 alias vim='nvim'
 alias vi='nvim'
 
+{{- if eq .chezmoi.os "darwin" }}
+if command -v ssh-add >/dev/null 2>&1; then
+  ssh-add --apple-load-keychain >/dev/null 2>&1 || ssh-add -A >/dev/null 2>&1 || true
+fi
+{{- else }}
 if command -v ssh-agent >/dev/null 2>&1 && command -v ssh-add >/dev/null 2>&1; then
   if [ -f "$HOME/.ssh/agent.env" ]; then
     source "$HOME/.ssh/agent.env" >/dev/null 2>&1
@@ -45,6 +50,7 @@ if command -v ssh-agent >/dev/null 2>&1 && command -v ssh-add >/dev/null 2>&1; t
   fi
 {{- end }}
 fi
+{{- end }}
 
 if command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init zsh --config ~/.config/ohmyposh/config.omp.json)"
