@@ -1,25 +1,16 @@
 return {
 	"neovim/nvim-lspconfig",
-	dependencies = { "saghen/blink.cmp" },
-	-- example using `opts` for defining servers
-	opts = {
-		servers = {
-			lua_ls = {},
-		},
+	event = { "BufReadPre", "BufNewFile" },
+	dependencies = {
+		"saghen/blink.cmp",
+		"williamboman/mason.nvim",
+		"williamboman/mason-lspconfig.nvim",
 	},
 	keys = {
 		{ "<leader>e", "<cmd>Telescope diagnostics<cr>", desc = "Open diagnostics" },
 		{ "gD", vim.lsp.buf.declaration, desc = "Go to declaration" },
-		{
-			"gd",
-			vim.lsp.buf.definition,
-			desc = "Go to definition",
-		},
-		{
-			"gi",
-			vim.lsp.buf.implementation,
-			desc = "Go to implementation",
-		},
+		{ "gd", vim.lsp.buf.definition, desc = "Go to definition" },
+		{ "gi", vim.lsp.buf.implementation, desc = "Go to implementation" },
 		{
 			"K",
 			function()
@@ -32,14 +23,57 @@ return {
 			desc = "Hover documentation",
 		},
 	},
-	config = function(_, opts)
-		opts.presets = {
-			blink = {
-				auto_enable = true,
+	config = function()
+		local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+		require("mason").setup()
+		require("mason-lspconfig").setup({
+			ensure_installed = {
+				"lua_ls",
+				"gopls",
+				"vtsls",
+				"ty",
 			},
-			preset = {
-				lsp_doc_border = true,
+			automatic_enable = false,
+		})
+
+		vim.lsp.config("lua_ls", {
+			capabilities = capabilities,
+			settings = {
+				Lua = {
+					runtime = { version = "LuaJIT" },
+					diagnostics = { globals = { "vim" } },
+					workspace = {
+						library = vim.api.nvim_get_runtime_file("", true),
+						checkThirdParty = false,
+					},
+					format = {
+						enable = true,
+						defaultConfig = {
+							indent_style = "space",
+							indent_size = "2",
+						},
+					},
+				},
 			},
-		}
+		})
+
+		vim.lsp.config("gopls", { capabilities = capabilities })
+		vim.lsp.config("vtsls", { capabilities = capabilities })
+		vim.lsp.config("ty", { capabilities = capabilities })
+
+		vim.lsp.enable({ "lua_ls", "gopls", "vtsls" })
+		vim.lsp.enable("rust_analyzer", false)
+
+		vim.diagnostic.config({
+			float = {
+				focusable = false,
+				style = "minimal",
+				border = "rounded",
+				source = "always",
+				header = "",
+				prefix = "",
+			},
+		})
 	end,
 }

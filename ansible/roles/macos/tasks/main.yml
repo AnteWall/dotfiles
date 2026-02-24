@@ -14,6 +14,10 @@
     cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   when: not brew_opt.stat.exists and not brew_usr_local.stat.exists
 
+- name: Set Homebrew prefix fact on macOS
+  ansible.builtin.set_fact:
+    macos_homebrew_prefix: "{{ '/opt/homebrew' if brew_opt.stat.exists else '/usr/local' }}"
+
 - name: Ensure Homebrew taps are configured on macOS
   community.general.homebrew_tap:
     name: "{{ homebrew_taps | default([]) }}"
@@ -29,6 +33,16 @@
   when: macos_brew_packages | default([]) | length > 0
   environment:
     PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
+- name: Ensure python3 shim exists for gcloud-cli installer
+  ansible.builtin.file:
+    src: "{{ macos_homebrew_prefix }}/opt/python@3.13/libexec/bin/python"
+    dest: "{{ macos_homebrew_prefix }}/opt/python@3.13/libexec/bin/python3"
+    state: link
+    force: false
+  when:
+    - "'gcloud-cli' in (macos_cask_packages | default([]))"
+    - "'python@3.13' in (macos_brew_packages | default([]))"
 
 - name: Check installed fnm Node.js versions on macOS
   ansible.builtin.command:

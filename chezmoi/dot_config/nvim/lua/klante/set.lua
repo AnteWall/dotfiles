@@ -1,6 +1,7 @@
 -- Fat vim cursor
 vim.opt.guicursor = ""
-
+-- Auto read files when changed outside of vim
+vim.opt.autoread = true
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 	pattern = "*.json.tmpl",
 	callback = function()
