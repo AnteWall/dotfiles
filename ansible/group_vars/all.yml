@@ -20,7 +20,6 @@ linux_brew_packages:
   - neovim
   - oh-my-posh
   - tree-sitter-cli
-  - yazi
   - 1password-cli
   - uv
   - oven-sh/bun/bun
@@ -35,7 +34,6 @@ macos_brew_packages:
   - anomalyco/tap/opencode
   - oh-my-posh
   - tree-sitter-cli
-  - yazi
   - 1password-cli
   - uv
   - python@3.13

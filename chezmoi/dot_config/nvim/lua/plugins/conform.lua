@@ -2,20 +2,24 @@ return {
 	"stevearc/conform.nvim",
 	opts = {},
 	config = function()
-			require("conform").setup({
-				format_on_save = {
-					timeout_ms = 5000,
-					lsp_format = "fallback",
-				},
-				formatters_by_ft = {
-					c = { "clang-format" },
-					cpp = { "clang-format" },
-					json = { "biome", "prettier", "jq" },
-					jsonc = { "biome", "prettier" },
-					lua = { "stylua" },
-					go = { "gofmt" },
-					javascript = { "biome" },
-				typescript = { "biome" },
+		require("conform").setup({
+			format_on_save = {
+				timeout_ms = 500,
+				lsp_format = "fallback",
+			},
+			formatters_by_ft = {
+				c = { "clang-format" },
+				cpp = { "clang-format" },
+				json = { "biome", "prettier", "jq" },
+				jsonc = { "biome", "prettier" },
+				lua = { "stylua" },
+				go = { "gofmt" },
+				buf = { "buf" },
+				rust = { "rustfmt" },
+				javascript = { "biome", "biome-organize-imports", "prettier" },
+				javascriptreact = { "biome", "biome-organize-imports", "prettier" },
+				typescript = { "biome", "biome-organize-imports", "prettier" },
+				typescriptreact = { "biome", "biome-organize-imports", "prettier" },
 			},
 			formatters = {
 				["clang-format"] = {

@@ -14,6 +14,8 @@ fi
 {{- if eq .chezmoi.os "darwin" }}
 # macOS defaults
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="/opt/homebrew/share/google-cloud-sdk/bin:$PATH"
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 {{- end }}
 
 {{- if eq .chezmoi.os "linux" }}

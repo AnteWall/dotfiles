@@ -1,10 +1,11 @@
 vim.g.mapleader = " "
 
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww $HOME/.local/bin/tmux-sessionizer<CR>",
-    { desc = "Open tmux sessionizer" })
-
--- Replaced by Yazi
--- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set(
+	"n",
+	"<C-f>",
+	"<cmd>silent !tmux neww $HOME/.local/bin/tmux-sessionizer<CR>",
+	{ desc = "Open tmux sessionizer" }
+)
 
 -- Select code and then move up/down with J and K
 vim.keymap.set("v", "K", ":m '<-2 <CR>gv=gv", { desc = "Move visual block up" })

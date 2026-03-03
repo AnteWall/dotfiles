@@ -8,6 +8,7 @@ return {
 	},
 	keys = {
 		{ "<leader>e", "<cmd>Telescope diagnostics<cr>", desc = "Open diagnostics" },
+		{ "<leader>a", vim.lsp.buf.code_action, desc = "Code action" },
 		{ "gD", vim.lsp.buf.declaration, desc = "Go to declaration" },
 		{ "gd", vim.lsp.buf.definition, desc = "Go to definition" },
 		{ "gi", vim.lsp.buf.implementation, desc = "Go to implementation" },
@@ -33,8 +34,16 @@ return {
 				"gopls",
 				"vtsls",
 				"ty",
+				"buf_ls",
 			},
 			automatic_enable = false,
+		})
+
+		vim.lsp.config("buf_ls", {
+			capabilities = capabilities,
+			cmd = { "buf", "lsp", "serve" },
+			filetypes = { "proto" },
+			root_markers = { "buf.yaml", ".git" },
 		})
 
 		vim.lsp.config("lua_ls", {
@@ -64,13 +73,16 @@ return {
 
 		vim.lsp.enable({ "lua_ls", "gopls", "vtsls" })
 		vim.lsp.enable("rust_analyzer", false)
+		vim.lsp.enable("ty")
+		vim.lsp.enable("buf_ls")
 
 		vim.diagnostic.config({
+			virtual_lines = { current_line = true },
+			virtual_text = false,
 			float = {
 				focusable = false,
 				style = "minimal",
 				border = "rounded",
-				source = "always",
 				header = "",
 				prefix = "",
 			},
