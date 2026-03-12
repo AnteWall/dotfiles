@@ -24,6 +24,7 @@ linux_brew_packages:
   - uv
   - oven-sh/bun/bun
   - gcloud-cli
+  - lazygit
 
 macos_brew_packages:
   - git
@@ -38,6 +39,7 @@ macos_brew_packages:
   - uv
   - python@3.13
   - oven-sh/bun/bun
+  - lazygit
 
 macos_cask_packages:
   - gcloud-cli
