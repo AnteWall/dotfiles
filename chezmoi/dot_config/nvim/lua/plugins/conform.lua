@@ -13,7 +13,7 @@ return {
 				json = { "biome", "prettier", "jq" },
 				jsonc = { "biome", "prettier" },
 				lua = { "stylua" },
-				go = { "gofmt" },
+				go = { "gofumpt", "gofmt" },
 				buf = { "buf" },
 				rust = { "rustfmt" },
 				javascript = { "biome", "biome-organize-imports", "prettier" },

@@ -2,16 +2,29 @@ return {
 	"neovim/nvim-lspconfig",
 	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
-		"saghen/blink.cmp",
+		"hrsh7th/cmp-nvim-lsp",
 		"williamboman/mason.nvim",
 		"williamboman/mason-lspconfig.nvim",
 	},
 	keys = {
-		{ "<leader>e", "<cmd>Telescope diagnostics<cr>", desc = "Open diagnostics" },
+		{
+			"<leader>e",
+			function()
+				Snacks.picker.diagnostics()
+			end,
+			desc = "Open diagnostics",
+		},
 		{ "<leader>a", vim.lsp.buf.code_action, desc = "Code action" },
 		{ "gD", vim.lsp.buf.declaration, desc = "Go to declaration" },
 		{ "gd", vim.lsp.buf.definition, desc = "Go to definition" },
 		{ "gi", vim.lsp.buf.implementation, desc = "Go to implementation" },
+		{
+			"<leader>th",
+			function()
+				vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+			end,
+			desc = "Toggle inlay hints",
+		},
 		{
 			"K",
 			function()
@@ -25,19 +38,23 @@ return {
 		},
 	},
 	config = function()
-		local capabilities = require("blink.cmp").get_lsp_capabilities()
+		local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 		require("mason").setup()
 		require("mason-lspconfig").setup({
 			ensure_installed = {
 				"lua_ls",
 				"gopls",
-				"vtsls",
+				"rust_analyzer",
 				"ty",
+				"pyright",
 				"buf_ls",
 			},
 			automatic_enable = false,
 		})
+
+		-- Enable inlay hints globally
+		vim.lsp.inlay_hint.enable(true)
 
 		vim.lsp.config("buf_ls", {
 			capabilities = capabilities,
@@ -63,17 +80,58 @@ return {
 							indent_size = "2",
 						},
 					},
+					hint = {
+						enable = true,
+						paramName = "All",
+						paramType = true,
+						setType = true,
+						arrayIndex = "Enable",
+					},
 				},
 			},
 		})
 
-		vim.lsp.config("gopls", { capabilities = capabilities })
-		vim.lsp.config("vtsls", { capabilities = capabilities })
+		vim.lsp.config("gopls", {
+			capabilities = capabilities,
+			settings = {
+				gopls = {
+					hints = {
+						assignVariableTypes = true,
+						compositeLiteralFields = true,
+						compositeLiteralTypes = true,
+						constantValues = true,
+						functionTypeParameters = true,
+						parameterNames = true,
+						rangeVariableTypes = true,
+					},
+				},
+			},
+		})
+		vim.lsp.config("pyright", {
+			capabilities = capabilities,
+			settings = {
+				pyright = {
+					-- Let ty handle type checking, use pyright for completions/imports
+					disableOrganizeImports = false,
+				},
+				python = {
+					analysis = {
+						-- Disable type checking since ty handles it
+						typeCheckingMode = "off",
+						autoImportCompletions = true,
+						autoSearchPaths = true,
+						useLibraryCodeForTypes = true,
+					},
+				},
+			},
+		})
+
 		vim.lsp.config("ty", { capabilities = capabilities })
 
-		vim.lsp.enable({ "lua_ls", "gopls", "vtsls" })
+		vim.lsp.enable({ "lua_ls", "gopls" })
 		vim.lsp.enable("rust_analyzer", false)
 		vim.lsp.enable("ty")
+		vim.lsp.enable("pyright")
 		vim.lsp.enable("buf_ls")
 
 		vim.diagnostic.config({

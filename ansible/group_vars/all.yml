@@ -16,6 +16,7 @@ homebrew_taps:
 
 linux_brew_packages:
   - anomalyco/tap/opencode
+  - bash
   - fnm
   - neovim
   - oh-my-posh
@@ -25,11 +26,14 @@ linux_brew_packages:
   - oven-sh/bun/bun
   - gcloud-cli
   - lazygit
+  - git-delta
+  - gofumpt
 
 macos_brew_packages:
   - git
   - curl
   - zsh
+  - bash
   - fnm
   - neovim
   - anomalyco/tap/opencode
@@ -40,6 +44,8 @@ macos_brew_packages:
   - python@3.13
   - oven-sh/bun/bun
   - lazygit
+  - git-delta
+  - gofumpt
 
 macos_cask_packages:
   - gcloud-cli

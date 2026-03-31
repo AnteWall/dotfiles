@@ -130,3 +130,47 @@
   args:
     creates: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/rustup"
   when: ansible_facts['system'] in ["Darwin", "Linux"]
+
+- name: Ensure ~/.tmux/plugins directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.tmux/plugins"
+    state: directory
+    mode: "0755"
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
+
+- name: Install TPM (Tmux Plugin Manager)
+  ansible.builtin.git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ ansible_facts['env']['HOME'] }}/.tmux/plugins/tpm"
+    depth: 1
+    update: false
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
+
+- name: Ensure ~/.zsh/plugins directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.zsh/plugins"
+    state: directory
+    mode: "0755"
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
+
+- name: Install zsh-autosuggestions
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "{{ ansible_facts['env']['HOME'] }}/.zsh/plugins/zsh-autosuggestions"
+    depth: 1
+    update: false
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
+
+- name: Install zsh-syntax-highlighting
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting
+    dest: "{{ ansible_facts['env']['HOME'] }}/.zsh/plugins/zsh-syntax-highlighting"
+    depth: 1
+    update: false
+  when: ansible_facts['system'] in ["Darwin", "Linux"]
+
+- name: Apply chezmoi dotfiles
+  ansible.builtin.command:
+    cmd: chezmoi apply
+  changed_when: false
+  when: ansible_facts['system'] in ["Darwin", "Linux"]

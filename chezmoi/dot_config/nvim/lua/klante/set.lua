@@ -1,7 +1,19 @@
--- Fat vim cursor
-vim.opt.guicursor = ""
+-- vim cursor
+vim.opt.guicursor = {
+	"n-v-c:block",
+	"i-ci-ve:ver25",
+	"r-cr:hor20",
+}
 -- Auto read files when changed outside of vim
 vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+	pattern = "*",
+	callback = function()
+		if vim.fn.mode() ~= "c" then
+			vim.cmd("checktime")
+		end
+	end,
+})
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 	pattern = "*.json.tmpl",
 	callback = function()
@@ -55,3 +67,6 @@ vim.opt.colorcolumn = "80"
 vim.g.mapleader = " "
 
 vim.o.winborder = "rounded"
+
+vim.cmd("filetype plugin indent on")
+vim.opt.autoindent = true

@@ -8,8 +8,8 @@ vim.keymap.set(
 )
 
 -- Select code and then move up/down with J and K
-vim.keymap.set("v", "K", ":m '<-2 <CR>gv=gv", { desc = "Move visual block up" })
-vim.keymap.set("v", "J", ":m '>+1 <CR>gv=gv", { desc = "Move visual block down" })
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move visual block up" })
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move visual block down" })
 
 -- fix J not moving your cursor wierd...
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join line below" })
@@ -17,7 +17,7 @@ vim.keymap.set("n", "J", "mzJ`z", { desc = "Join line below" })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half-page down and center" })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half-page up and center" })
 
--- Screw p replacing clipboard, this fixes it
+-- Paste over selection without yanking replaced text
 vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without yanking replaced text" })
 
 -- Copy to system clipboard
@@ -28,13 +28,13 @@ vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Yank line to system clipboar
 vim.keymap.set({ "n", "v" }, "<leader>p", [["+p]], { desc = "Paste from system clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>P", [["+P]], { desc = "Paste before from system clipboard" })
 
--- Delte without destroying clipboard
+-- Delete without destroying clipboard
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete without yanking" })
 
 -- Screw Ex Mode
 vim.keymap.set("n", "Q", "<nop>", { desc = "Disable Ex mode" })
 
--- replace word under cursor
+-- Replace word under cursor
 vim.keymap.set(
 	"n",
 	"<leader>s",

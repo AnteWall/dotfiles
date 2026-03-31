@@ -1,3 +1,9 @@
+{{- if or (not .git.name) (eq .git.name "Your Name") -}}
+{{   fail "git.name is not set. Create ~/.config/chezmoi/chezmoi.toml with [data.git] name = \"...\"" }}
+{{- end -}}
+{{- if or (not .git.email) (eq .git.email "you@example.com") -}}
+{{   fail "git.email is not set. Create ~/.config/chezmoi/chezmoi.toml with [data.git] email = \"...\"" }}
+{{- end -}}
 [user]
     name = {{ .git.name | quote }}
     email = {{ .git.email | quote }}
@@ -10,6 +16,28 @@
 
 [core]
     editor = nvim
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = false
+    side-by-side = false
+    line-numbers = true
+    hyperlinks = true
+    hyperlinks-file-link-format = "lazygit-edit://{path}:{line}"
+    minus-style                   = syntax "#4a272f"
+    minus-non-emph-style          = syntax "#4a272f"
+    minus-emph-style              = syntax "#713137"
+    minus-empty-line-marker-style = syntax "#4a272f"
+    line-numbers-minus-style      = "#914c54"
+    plus-style                    = syntax "#243e4a"
+    plus-non-emph-style           = syntax "#243e4a"
+    plus-emph-style               = syntax "#2c5a66"
+    plus-empty-line-marker-style  = syntax "#243e4a"
+    line-numbers-plus-style       = "#449dab"
+    line-numbers-zero-style       = "#3b4261"
 
 [url "git@github.com:"]
     insteadOf = https://github.com/
