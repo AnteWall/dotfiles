@@ -31,6 +31,9 @@ vim.keymap.set({ "n", "v" }, "<leader>P", [["+P]], { desc = "Paste before from s
 -- Delete without destroying clipboard
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete without yanking" })
 
+-- Save file
+vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
+
 -- Screw Ex Mode
 vim.keymap.set("n", "Q", "<nop>", { desc = "Disable Ex mode" })
 

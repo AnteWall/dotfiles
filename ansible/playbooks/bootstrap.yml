@@ -5,6 +5,11 @@
   become: false
   vars_files:
     - ../group_vars/all.yml
+  vars_prompt:
+    - name: sudo_password
+      prompt: "Enter sudo password (for pkg installers, leave empty to skip)"
+      private: true
+      default: ""
 
   roles:
     - role: common

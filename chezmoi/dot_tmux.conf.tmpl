@@ -2,12 +2,14 @@
 set-option -g default-command "${SHELL}"
 set-option -g default-shell /opt/homebrew/bin/bash
 
-# My terminal has lots of pretty colors, use it!
-set -ga terminal-overrides ",screen-256color*:Tc"
-set-option -g default-terminal "screen-256color"
+# True color and bracketed paste support
+set-option -g default-terminal "tmux-256color"
+set -as terminal-overrides ",*:Tc"
+set -as terminal-features ",xterm-ghostty:RGB:paste"
 
-# No delay when typing!
-set -s escape-time 0
+# Low escape-time for fast Esc response, but non-zero to avoid
+# breaking bracketed paste sequences from the outer terminal
+set -s escape-time 10
 
 # Lets not use, Ctrl-b as prefix, use Ctrl-a
 unbind C-b
@@ -27,8 +29,11 @@ set -g base-index 1
 set-window-option -g mode-keys vi
 
 # Lets copy like vim, and add copy to clipboard
-bind -T copy-mode-vi y send-keys -X begin-selection
+{{- if eq .chezmoi.os "darwin" }}
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
+{{- else }}
 bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+{{- end }}
 
 # vim like pane switching
 bind -r ^ last-window

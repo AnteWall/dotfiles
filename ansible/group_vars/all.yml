@@ -9,10 +9,13 @@ common_packages:
 linux_packages:
   - build-essential
   - zsh
+  - ghostty
 
 homebrew_taps:
   - anomalyco/tap
   - oven-sh/bun
+  - FelixKratz/formulae
+  - asmvik/formulae
 
 linux_brew_packages:
   - anomalyco/tap/opencode
@@ -46,9 +49,22 @@ macos_brew_packages:
   - lazygit
   - git-delta
   - gofumpt
+  - lua
+  - sketchybar
+  - asmvik/formulae/yabai
+  - asmvik/formulae/skhd
+  - borders
 
 macos_cask_packages:
   - gcloud-cli
+  - ghostty
+  - font-hack-nerd-font
+  - font-sketchybar-app-font
+
+# Casks that require sudo (pkg installers)
+macos_cask_sudo_packages:
+  - font-sf-pro
+  - sf-symbols
 
 oh_my_posh_install_font: true
 oh_my_posh_font: meslo

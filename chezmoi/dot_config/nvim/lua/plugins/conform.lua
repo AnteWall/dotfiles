@@ -15,6 +15,7 @@ return {
 				lua = { "stylua" },
 				go = { "gofumpt", "gofmt" },
 				buf = { "buf" },
+				python = { "ruff_format", "ruff_organize_imports" },
 				rust = { "rustfmt" },
 				javascript = { "biome", "biome-organize-imports", "prettier" },
 				javascriptreact = { "biome", "biome-organize-imports", "prettier" },

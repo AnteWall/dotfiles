@@ -47,7 +47,6 @@ return {
 				"gopls",
 				"rust_analyzer",
 				"ty",
-				"pyright",
 				"buf_ls",
 			},
 			automatic_enable = false,
@@ -107,31 +106,11 @@ return {
 				},
 			},
 		})
-		vim.lsp.config("pyright", {
-			capabilities = capabilities,
-			settings = {
-				pyright = {
-					-- Let ty handle type checking, use pyright for completions/imports
-					disableOrganizeImports = false,
-				},
-				python = {
-					analysis = {
-						-- Disable type checking since ty handles it
-						typeCheckingMode = "off",
-						autoImportCompletions = true,
-						autoSearchPaths = true,
-						useLibraryCodeForTypes = true,
-					},
-				},
-			},
-		})
-
 		vim.lsp.config("ty", { capabilities = capabilities })
 
 		vim.lsp.enable({ "lua_ls", "gopls" })
 		vim.lsp.enable("rust_analyzer", false)
 		vim.lsp.enable("ty")
-		vim.lsp.enable("pyright")
 		vim.lsp.enable("buf_ls")
 
 		vim.diagnostic.config({

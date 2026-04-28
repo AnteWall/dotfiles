@@ -89,6 +89,79 @@
   environment:
     PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
 
+- name: Ensure Homebrew cask packages requiring sudo are installed
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: present
+    sudo_password: "{{ sudo_password }}"
+  loop: "{{ macos_cask_sudo_packages | default([]) }}"
+  when:
+    - macos_cask_sudo_packages | default([]) | length > 0
+    - sudo_password | default('') | length > 0
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
+- name: Start SketchyBar service via Homebrew
+  ansible.builtin.command:
+    cmd: brew services start sketchybar
+  register: sketchybar_service
+  changed_when: "'Successfully started' in sketchybar_service.stdout"
+  failed_when: false
+  when: "'sketchybar' in (macos_brew_packages | default([]))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
+- name: Start yabai service
+  ansible.builtin.command:
+    cmd: yabai --start-service
+  register: yabai_service
+  changed_when: yabai_service.rc == 0
+  failed_when: false
+  when: "'asmvik/formulae/yabai' in (macos_brew_packages | default([]))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
+- name: Start skhd service
+  ansible.builtin.command:
+    cmd: skhd --start-service
+  register: skhd_service
+  changed_when: skhd_service.rc == 0
+  failed_when: false
+  when: "'asmvik/formulae/skhd' in (macos_brew_packages | default([]))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
+- name: Start JankyBorders service via Homebrew
+  ansible.builtin.command:
+    cmd: brew services start borders
+  register: borders_service
+  changed_when: "'Successfully started' in borders_service.stdout"
+  failed_when: false
+  when: "'borders' in (macos_brew_packages | default([]))"
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
+- name: Check if SbarLua module is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/sketchybar_lua/sketchybar.so"
+  register: sbarlua_module
+  when: "'sketchybar' in (macos_brew_packages | default([]))"
+
+- name: Clone and build SbarLua module for Lua-based sketchybar config
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      TMPDIR=$(mktemp -d)
+      git clone https://github.com/FelixKratz/SbarLua.git "$TMPDIR"
+      cd "$TMPDIR"
+      make install
+      rm -rf "$TMPDIR"
+  when:
+    - "'sketchybar' in (macos_brew_packages | default([]))"
+    - not (sbarlua_module.stat.exists | default(false))
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+
 - name: Check if Oh My Posh font is already installed on macOS
   ansible.builtin.find:
     paths: "{{ ansible_facts['env']['HOME'] }}/Library/Fonts"
