@@ -6,8 +6,8 @@ return {
 
   -- Font config
   font = {
-    text = "Hack Nerd Font", -- Used for text/labels
-    numbers = "Hack Nerd Font", -- Used for numbers
+    text = "JetBrainsMono Nerd Font", -- Used for text/labels
+    numbers = "JetBrainsMono Nerd Font", -- Used for numbers
     icons = "SF Pro", -- Used for SF Symbols icons
     style_map = {
       ["Regular"] = "Regular",

@@ -7,20 +7,20 @@ alignment = "left"
   [[blocks.segments]]
   type = "text"
   style = "plain"
-  foreground = "black"
-  background = "cyan"
+  foreground = "#11111b"
+  background = "#89b4fa"
   template = " OMP "
 
   [[blocks.segments]]
   type = "path"
   style = "plain"
-  foreground = "cyan"
+  foreground = "#89b4fa"
   template = " {{ .Path }} "
 
   [[blocks.segments]]
   type = "git"
   style = "plain"
-  foreground = "green"
+  foreground = "#a6e3a1"
   template = " {{ .HEAD }}{{ if .Working.Changed }}*{{ end }} "
 
 [[blocks]]
@@ -30,7 +30,7 @@ alignment = "right"
   [[blocks.segments]]
   type = "executiontime"
   style = "plain"
-  foreground = "yellow"
+  foreground = "#f9e2af"
   template = "{{ .FormattedMs }} "
 
 [[blocks]]
@@ -41,5 +41,5 @@ newline = true
   [[blocks.segments]]
   type = "text"
   style = "plain"
-  foreground = "magenta"
+  foreground = "#cba6f7"
   template = "> "

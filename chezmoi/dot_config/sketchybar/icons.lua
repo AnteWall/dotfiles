@@ -6,6 +6,7 @@ local icons = {
     loading = "􀖇",
     apple = "􀣺",
     gear = "􀍟",
+    menubar = "􀆫",
     cpu = "􀫥",
     clipboard = "􀉄",
 
@@ -48,6 +49,7 @@ local icons = {
     loading = "",
     apple = "",
     gear = "",
+    menubar = "󰍜",
     cpu = "",
     clipboard = "Missing Icon",
 

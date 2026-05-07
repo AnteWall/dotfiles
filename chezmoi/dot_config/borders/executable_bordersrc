@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # JankyBorders configuration
-# Colors match Sonokai theme used in sketchybar
+# Colors match Catppuccin Mocha used across the desktop
 
 options=(
 	style=round
 	width=8.0
 	hidpi=off
-	active_color=0xff76cce0
-	inactive_color=0xff414550
+	active_color=0xff89b4fa
+	inactive_color=0xff45475a
 )
 
 borders "${options[@]}"

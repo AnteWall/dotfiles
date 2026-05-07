@@ -1,69 +1,181 @@
-#!/usr/bin/env sh
+#!/usr/bin/env zsh
 
-sudo yabai --load-sa
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+declare -r YABAIRC=$0
+declare -r NORMAL_PADDING=8
+declare -r NORMAL_VERTICAL_PADDING=8
+declare -r ULTRAWIDE_VERTICAL_PADDING=60
+declare -r WINDOW_GAP=10
 
-yabai -m config external_bar               all:40:0       \
-                mouse_follows_focus        off            \
-                focus_follows_mouse        off            \
-                window_zoom_persist        off            \
-                window_placement           second_child   \
-                window_insertion_point     last           \
-                window_shadow              float          \
-                window_opacity             on             \
-                window_opacity_duration    0.2            \
-                active_window_opacity      1.0            \
-                normal_window_opacity      0.8            \
-                window_animation_duration  0.12           \
-                window_animation_easing    ease_out_quint \
-                insert_feedback_color      0xff9dd274     \
-                split_ratio                0.50           \
-                auto_balance               off            \
-                mouse_modifier             fn             \
-                mouse_action1              move           \
-                mouse_action2              resize         \
-                mouse_drop_action          swap           \
-                                                          \
-                top_padding                8              \
-                bottom_padding             8              \
-                left_padding               8              \
-                right_padding              8              \
-                window_gap                 10
+function get_display_aspect_ratio {
+  case $(yabai -m query --displays --display mouse | jq '.frame | (.w)/(.h) | round') in
+    (2) echo "16:9" ;;
+    (4) echo "32:9" ;;
+    (*) echo "something:whacky" ;;
+  esac
+}
 
-# Hide native macOS menu bar (sketchybar replaces it)
-yabai -m config menubar_opacity            0.0
+function get_space_num_managed_windows {
+ yabai -m query --windows --space mouse | \
+   jq 'map(select(."is-visible" == true
+                  and ."is-floating" == false
+                  and ."is-minimized" == false
+                  and ."is-hidden" == false)) |
+    # deal with how hidden applications apparently still
+    # have visible windows
+    if all(."split-type" == "none") then
+      1
+    else
+      map(select(."split-type" != "none")) | length
+    end'
+}
 
-# Exclude problematic apps from being managed
-yabai -m rule --add app="^(LuLu|Calculator|Software Update|Dictionary|VLC|System Preferences|System Settings|zoom.us|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Steam|Alfred|Activity Monitor)$" manage=off
-yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
-yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
-yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
-yabai -m rule --add app="^1Password" manage=off
-yabai -m rule --add app="^Karabiner" manage=off
-yabai -m rule --add app="^SF Symbols$" manage=off
-yabai -m rule --add app="^Stickies$" manage=off
-yabai -m rule --add app="^Pop$" manage=off
-yabai -m rule --add app="^Preview$" title="^Open$" manage=off
+function get_display_width {
+  yabai -m query --displays --display mouse | jq -r '.frame.w | floor'
+}
 
-# Sketchybar integration signals
-yabai -m signal --add event=window_focused       action="sketchybar --trigger window_focus &> /dev/null"
-yabai -m signal --add event=window_title_changed action="sketchybar --trigger title_change &> /dev/null"
+function move_nested_split_right {
+  yabai -m query --windows --space mouse | \
+    jq -r '[.[] | select(."is-visible" == true
+                          and ."is-floating" == false
+                          and ."is-minimized" == false
+                          and ."is-hidden" == false)] as $windows
+           | ($windows | map(.frame.x) | max) as $rightmost_x
+           | $windows
+           | map(select(."split-type" == "horizontal" and .frame.x < $rightmost_x))
+           | sort_by(.frame.y)
+           | last.id // empty' | \
+    while read -r window_id; do
+      [[ -n $window_id ]] && yabai -m window $window_id --warp east
+    done
+}
 
-# Ultrawide dynamic padding — adjust left/right padding based on window count
-ULTRAWIDE_SCRIPT="$HOME/.config/yabai/ultrawide_padding.sh"
-yabai -m signal --add event=window_created          action="$ULTRAWIDE_SCRIPT"
-yabai -m signal --add event=window_destroyed        action="$ULTRAWIDE_SCRIPT"
-yabai -m signal --add event=window_minimized        action="$ULTRAWIDE_SCRIPT"
-yabai -m signal --add event=window_deminimized      action="$ULTRAWIDE_SCRIPT"
-yabai -m signal --add event=space_changed           action="$ULTRAWIDE_SCRIPT"
-yabai -m signal --add event=display_changed         action="$ULTRAWIDE_SCRIPT"
+function get_ultrawide_center_padding {
+  local window_count=$1
+  local display_width=$(get_display_width)
+  local target_width=$((display_width / 4))
+  local total_gaps=$(((window_count - 1) * WINDOW_GAP))
+  local needed=$((window_count * target_width + total_gaps))
+  local padding=$(((display_width - needed) / 2))
 
-yabai -m config layout bsp
+  if [[ $padding -lt $NORMAL_PADDING ]]; then
+    echo $NORMAL_PADDING
+  else
+    echo $padding
+  fi
+}
 
-# Re-apply manage=off rules to windows that existed before yabai restarted.
-yabai -m rule --apply
+function maybe_center_space {
+  local window_count=$(get_space_num_managed_windows)
 
-# Set initial ultrawide padding for the current space
-"$ULTRAWIDE_SCRIPT"
+  if [[ $(get_display_aspect_ratio) == "32:9" ]]; then
+    case $window_count in
+      (0|1)
+        yabai -m config window_insertion_point last
+        yabai -m config window_placement second_child
+        yabai -m config --space mouse split_type vertical auto_balance off
+        local padding=$(get_ultrawide_center_padding 1)
+        yabai -m space --padding abs:$ULTRAWIDE_VERTICAL_PADDING:$ULTRAWIDE_VERTICAL_PADDING:$padding:$padding
+        ;;
+      (2)
+        yabai -m config window_insertion_point last
+        yabai -m config window_placement second_child
+        yabai -m config --space mouse split_type vertical auto_balance off
+        local padding=$(get_ultrawide_center_padding 2)
+        yabai -m space --padding abs:$ULTRAWIDE_VERTICAL_PADDING:$ULTRAWIDE_VERTICAL_PADDING:$padding:$padding
+        ;;
+      (3|4)
+        yabai -m config window_insertion_point last
+        yabai -m config window_placement second_child
+        yabai -m config --space mouse split_type vertical auto_balance off
+        move_nested_split_right
+        local padding=$(get_ultrawide_center_padding $window_count)
+        yabai -m space --padding abs:$ULTRAWIDE_VERTICAL_PADDING:$ULTRAWIDE_VERTICAL_PADDING:$padding:$padding
+        ;;
+      (*)
+        yabai -m config window_insertion_point last
+        yabai -m config window_placement second_child
+        yabai -m config --space mouse split_type auto auto_balance off
+        yabai -m space --padding abs:$NORMAL_VERTICAL_PADDING:$NORMAL_VERTICAL_PADDING:$NORMAL_PADDING:$NORMAL_PADDING
+        ;;
+    esac
+  else
+    yabai -m config window_insertion_point last
+    yabai -m config window_placement second_child
+    yabai -m config --space mouse split_type auto auto_balance off
+    yabai -m space --padding abs:$NORMAL_VERTICAL_PADDING:$NORMAL_VERTICAL_PADDING:$NORMAL_PADDING:$NORMAL_PADDING
+  fi
+}
 
-echo "yabai configuration loaded.."
+function config_rules {
+  yabai -m rule --add app=SideNotes manage=off
+  yabai -m rule --add app=Session   manage=off
+  yabai -m rule --add app=Slidepad  manage=off
+}
+
+function config_signals {
+  for signal (
+    application_launched application_terminated
+    application_hidden application_visible
+    window_created window_destroyed window_minimized window_deminimized
+    space_changed
+    display_resized system_woke
+  ); do
+    yabai -m signal --add event=$signal \
+      action="$YABAIRC maybe_center_space" \
+      label="maybe_center_space-on-$signal"
+  done
+}
+
+function config_main {
+  if [[ $SHLVL > 2 ]]; then
+    # yabai was run interactively, not via brew services
+    echo "Running interactively: skipping automatic SA load"
+    echo "Enabling debug output"
+
+    yabai -m config debug_output on
+  else
+    sudo yabai --load-sa
+  fi
+
+  config_rules
+
+  # global settings
+  yabai -m config mouse_follows_focus          off
+  yabai -m config focus_follows_mouse          autoraise
+  yabai -m config window_placement             second_child
+  yabai -m config window_insertion_point       last
+  yabai -m config window_topmost               off
+  yabai -m config window_shadow                off
+  yabai -m config window_opacity               on
+  yabai -m config active_window_opacity        1.0
+  yabai -m config normal_window_opacity        0.90
+  yabai -m config window_border                off
+  yabai -m config window_border_width          6
+  yabai -m config active_window_border_color   0xeef12f39
+  yabai -m config normal_window_border_color   0x9900bcdd
+  yabai -m config insert_feedback_color        0xffd75f5f
+  yabai -m config split_ratio                  0.50
+  yabai -m config auto_balance                 off
+  yabai -m config mouse_modifier               ctrl
+  yabai -m config mouse_action1                move
+  yabai -m config mouse_action2                resize
+  yabai -m config mouse_drop_action            swap
+
+  # general space settings
+  yabai -m config layout                       bsp
+  yabai -m config window_gap                   $WINDOW_GAP
+
+  if pgrep -q "Übersicht"; then
+    yabai -m config external_bar                 main:0:34
+    osascript -e 'tell application id "tracesOf.Uebersicht" to refresh widget id "simple-bar-spaces-jsx"'
+  fi
+
+  maybe_center_space
+  config_signals
+}
+
+if [[ $# == 0 ]]; then
+  config_main
+else
+  $1
+fi

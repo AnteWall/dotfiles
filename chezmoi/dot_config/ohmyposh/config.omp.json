@@ -4,7 +4,7 @@
     {
       "segments": [
         {
-          "foreground": "#00C5C7",
+          "foreground": "#94E2D5",
           "options": {
             "time_format": "15:04:05"
           },
@@ -19,7 +19,7 @@
       "alignment": "left",
       "segments": [
         {
-          "foreground": "#77E4F7",
+          "foreground": "#89B4FA",
           "options": {
             "style": "full"
           },
@@ -28,13 +28,13 @@
           "type": "path"
         },
         {
-          "foreground": "#FFE700",
+          "foreground": "#F9E2AF",
           "style": "plain",
           "template": "{{ .HEAD }} ",
           "type": "git"
         },
         {
-          "foreground": "#43D426",
+          "foreground": "#A6E3A1",
           "style": "plain",
           "template": "\u276f ",
           "type": "text"

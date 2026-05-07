@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  printf 'Usage: %s focus|move <space-index>\n' "${0##*/}" >&2
+  exit 2
+}
+
+[ "$#" -eq 2 ] || usage
+
+action=$1
+target=$2
+
+case "$action" in
+  focus|move) ;;
+  *) usage ;;
+esac
+
+case "$target" in
+  ''|*[!0-9]*) usage ;;
+esac
+
+while [ "$(yabai -m query --spaces | jq 'length')" -lt "$target" ]; do
+  yabai -m space --create
+done
+
+if [ "$action" = "move" ]; then
+  yabai -m window --space "$target" 2>/dev/null || true
+fi
+
+yabai -m space --focus "$target" 2>/dev/null || true

@@ -5,7 +5,7 @@ set-option -g default-shell /opt/homebrew/bin/bash
 # True color and bracketed paste support
 set-option -g default-terminal "tmux-256color"
 set -as terminal-overrides ",*:Tc"
-set -as terminal-features ",xterm-ghostty:RGB:paste"
+set -as terminal-features ",xterm-kitty:RGB:paste"
 
 # Low escape-time for fast Esc response, but non-zero to avoid
 # breaking bracketed paste sequences from the outer terminal
@@ -78,20 +78,22 @@ bind-key -T copy-mode-vi 'C-l' select-pane -R
 bind-key -T copy-mode-vi 'C-\' select-pane -l
 
 # Set active pane border color
-set -g pane-border-style fg=colour238
-set -g pane-active-border-style fg=colour39
+set -g pane-border-style fg="#45475a"
+set -g pane-active-border-style fg="#89b4fa"
 set -g focus-events on
 
 # TPM - Tmux Plugin Manager
 set -g @plugin 'tmux-plugins/tpm'
 
-# tmux-powerkit theme
-set -g @plugin 'fabioluciano/tmux-powerkit'
-set -g @powerkit_plugins "git,cpu,memory,datetime,hostname"
-set -g @powerkit_theme "tokyo-night"
-set -g @powerkit_theme_variant "night"
-set -g @powerkit_separator_style "rounded"
-set -g @powerkit_elements_spacing "both"
+# Catppuccin Mocha theme
+set -g @plugin 'catppuccin/tmux#v2.3.0'
+set -g @catppuccin_flavor "mocha"
+set -g @catppuccin_window_status_style "rounded"
+set -g status-right-length 100
+set -g status-left-length 100
+set -g status-left ""
+set -g status-right "#{E:@catppuccin_status_session}"
+set -ag status-right " #{E:@catppuccin_status_uptime}"
 
 # Initialize TPM (must be last line)
 run '~/.tmux/plugins/tpm/tpm'

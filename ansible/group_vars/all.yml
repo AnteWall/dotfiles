@@ -9,7 +9,7 @@ common_packages:
 linux_packages:
   - build-essential
   - zsh
-  - ghostty
+  - kitty
 
 homebrew_taps:
   - anomalyco/tap
@@ -31,6 +31,7 @@ linux_brew_packages:
   - lazygit
   - git-delta
   - gofumpt
+  - spicetify-cli
 
 macos_brew_packages:
   - git
@@ -54,11 +55,13 @@ macos_brew_packages:
   - asmvik/formulae/yabai
   - asmvik/formulae/skhd
   - borders
+  - spicetify-cli
 
 macos_cask_packages:
   - gcloud-cli
-  - ghostty
-  - font-hack-nerd-font
+  - kitty
+  - spotify
+  - font-jetbrains-mono-nerd-font
   - font-sketchybar-app-font
 
 # Casks that require sudo (pkg installers)
